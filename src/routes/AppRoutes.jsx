@@ -4,37 +4,43 @@ import ProtectedRoute from "./ProtectedRoute";
 import PublicRoute from "./PublicRoute";
 
 import { ROUTES } from "../constants/routes";
-
-// Temporary pages
-const Home = () => <h1>Home Page</h1>;
-
-const Login = () => <h1>Login Page</h1>;
-
-const Register = () => <h1>Register Page</h1>;
-
-const BuyerDashboard = () => <h1>Buyer Dashboard</h1>;
-
-const SellerDashboard = () => <h1>Seller Dashboard</h1>;
+import HomePage from "../pages/public/HomePage";
+import CategoriesPage from "../pages/public/CategoriesPage";
+import ProductsPage from "../pages/public/ProductsPage";
+import AboutPage from "../pages/public/AboutPage";
+import ContactPage from "../pages/public/ContactPage";
+import LoginPage from "../pages/auth/LoginPage";
+import RegisterPage from "../pages/auth/RegisterPage";
+import BuyerDashboardPage from "../pages/buyer/BuyerDashboardPage";
+import SellerDashboardPage from "../pages/seller/SellerDashboardPage";
 
 const AppRoutes = () => {
   return (
     <Routes>
       {/* Public Routes */}
       <Route element={<PublicRoute />}>
-        <Route path={ROUTES.AUTH.LOGIN} element={<Login />} />
+        <Route path={ROUTES.AUTH.LOGIN} element={<LoginPage />} />
 
-        <Route path={ROUTES.AUTH.REGISTER} element={<Register />} />
+        <Route path={ROUTES.AUTH.REGISTER} element={<RegisterPage />} />
+        <Route path={ROUTES.AUTH.SELLER_REGISTER} element={<RegisterPage />} />
       </Route>
 
       {/* Protected Routes */}
       <Route element={<ProtectedRoute />}>
-        <Route path={ROUTES.BUYER.DASHBOARD} element={<BuyerDashboard />} />
+        <Route path={ROUTES.BUYER.DASHBOARD} element={<BuyerDashboardPage />} />
 
-        <Route path={ROUTES.SELLER.DASHBOARD} element={<SellerDashboard />} />
+        <Route
+          path={ROUTES.SELLER.DASHBOARD}
+          element={<SellerDashboardPage />}
+        />
       </Route>
 
       {/* Default Route */}
-      <Route path={ROUTES.HOME} element={<Home />} />
+      <Route path={ROUTES.HOME} element={<HomePage />} />
+      <Route path="/categories" element={<CategoriesPage />} />
+      <Route path="/products" element={<ProductsPage />} />
+      <Route path="/about" element={<AboutPage />} />
+      <Route path="/contact" element={<ContactPage />} />
     </Routes>
   );
 };

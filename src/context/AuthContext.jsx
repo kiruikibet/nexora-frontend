@@ -1,12 +1,14 @@
-// src/context/AuthContext.jsx
+/* eslint-disable react-refresh/only-export-components */
 
-import { createContext, useContext, useState, useEffect } from "react";
 import {
-  login as loginService,
-  register as registerService,
-  getProfile,
-} from "../services/authService";
-
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
+import { login, register, getProfile } from "../services/authService";
 import {
   saveTokens,
   removeTokens,
@@ -15,69 +17,119 @@ import {
 
 const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
+export function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
-
   const [loading, setLoading] = useState(true);
 
+  /**
+   * Initialize authentication when the app loads
+   */
   useEffect(() => {
-    const initializeAuth = async () => {
-      const token = getAccessToken();
+    let isMounted = true;
+    async function initializeAuth() {
+      try {
+        const token = getAccessToken();
 
-      if (token) {
-        try {
-          const userData = await getProfile();
+        if (!token) {
+          if (isMounted) {
+            setLoading(false);
+          }
 
+          return;
+        }
+
+        const userData = await getProfile();
+
+        if (isMounted) {
           setUser(userData);
-        } catch (error) {
-          removeTokens();
+        }
+      } catch (error) {
+        removeTokens();
+
+        if (isMounted) {
+          setUser(null);
+        }
+      } finally {
+        if (isMounted) {
+          setLoading(false);
         }
       }
-
-      setLoading(false);
-    };
+    }
 
     initializeAuth();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
-  const login = async (credentials) => {
-    const data = await loginService(credentials);
+  /**
+   * Login
+   */
+  const loginUser = useCallback(async (credentials) => {
+    const data = await login(credentials);
 
     saveTokens(data.access, data.refresh);
 
     setUser(data.user);
 
     return data;
-  };
+  }, []);
 
-  const register = async (userData) => {
-    const data = await registerService(userData);
+  /**
+   * Register
+   */
+  const registerUser = useCallback(async (userData) => {
+    const data = await register(userData);
+    await login({
+      username_or_email: userData.email,
+      password: userData.password,
+    });
 
     return data;
-  };
+  }, []);
 
-  const logout = () => {
+  /**
+   * Logout
+   */
+  const logout = useCallback(() => {
     removeTokens();
-
     setUser(null);
-  };
+  }, []);
 
-  return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        register,
-        logout,
-        isAuthenticated: !!user,
-      }}
-    >
-      {children}
-    </AuthContext.Provider>
+  /**
+   * Update logged-in user
+   * Useful after editing profile
+   */
+  const updateUser = useCallback((updates) => {
+    setUser((current) => (current ? { ...current, ...updates } : current));
+  }, []);
+
+  /**
+   * Memoize context value
+   */
+  const value = useMemo(
+    () => ({
+      user,
+      loading,
+      login: loginUser,
+      register: registerUser,
+      logout,
+      updateUser,
+      isAuthenticated: !!user,
+    }),
+    [user, loading, loginUser, registerUser, logout, updateUser],
   );
-};
 
-export const useAuth = () => {
-  return useContext(AuthContext);
-};
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
+}
+
+export function useAuth() {
+  const context = useContext(AuthContext);
+
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+
+  return context;
+}
