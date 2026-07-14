@@ -1,16 +1,29 @@
-# React + Vite
+# Nexora Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This package contains the React + Vite frontend for the Nexora marketplace.
 
-Currently, two official plugins are available:
+The living technical reference is [FRONTEND_DOCUMENTATION.md](FRONTEND_DOCUMENTATION.md). It explains the current architecture, pages, shared components, routing, auth flow, API layer, styling, and editing guidance.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Quick Start
 
-## React Compiler
+1. Install dependencies.
+2. Set `VITE_API_URL` in your environment.
+3. Run `npm run dev` from `nexora-frontend`.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Current Scope
 
-## Expanding the ESLint configuration
+- Public pages: Home, Categories, Products, About, Contact
+- Authentication pages: Login, Register
+- Protected shells: Buyer dashboard, Seller dashboard
+- Shared UI: Navbar, Footer, SearchBar, CategoryMenu, EmptyState, Spinner, Button
+- State and data: Auth context, token storage, axios client, auth service
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+## Notes
+
+- The frontend currently has a clean shell and shared component foundation.
+- Some routes are scaffolded placeholders and are documented in the full guide.
+- The Button component uses a folder-based structure with separated style definitions.
+
+## Editing Flow
+
+If you want to extend the app as you go, start from the full reference in [FRONTEND_DOCUMENTATION.md](FRONTEND_DOCUMENTATION.md), then edit the matching component, page, route, or service file.

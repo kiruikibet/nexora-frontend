@@ -1,5 +1,6 @@
-import Navbar from "../../components/layout/Navbar";
+import Header from "../../layouts/Header";
 import Footer from "../../components/layout/Footer";
+import Button from "../../components/common/button";
 
 const architectureColumns = [
   {
@@ -20,7 +21,7 @@ const architectureColumns = [
 function HomePage() {
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.08),_transparent_35%),linear-gradient(180deg,_#f8fafc_0%,_#ffffff_100%)] text-slate-900">
-      <Navbar />
+      <Header />
 
       <main>
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">

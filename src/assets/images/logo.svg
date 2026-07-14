@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" fill="none" role="img" aria-label="Nexora logo">
+  <defs>
+    <linearGradient id="logoGradient" x1="10" y1="8" x2="54" y2="56" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0f172a" />
+      <stop offset="1" stop-color="#334155" />
+    </linearGradient>
+  </defs>
+  <rect x="4" y="4" width="56" height="56" rx="18" fill="url(#logoGradient)" />
+  <path d="M20 43V21h7.2l10.8 13.5V21H45v22h-7.2L27 29.5V43H20Z" fill="#f8fafc" />
+  <circle cx="46" cy="18" r="4" fill="#99f6e4" />
+</svg>

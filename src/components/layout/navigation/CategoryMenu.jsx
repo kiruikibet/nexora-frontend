@@ -1,3 +1,5 @@
+import Button from "../../common/button";
+
 const categories = [
   { label: "All Categories", icon: "◌" },
   { label: "Electronics", icon: "⌁" },
@@ -24,11 +26,13 @@ function CategoryMenu({ onSelect }) {
       <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
         <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
           {categories.map((category) => (
-            <button
+            <Button
               key={category.label}
               type="button"
               onClick={() => onSelect?.(category.label)}
-              className="inline-flex shrink-0 items-center gap-2 rounded-full border border-slate-200 bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white hover:text-slate-950"
+              variant="outline"
+              size="small"
+              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white hover:text-slate-950"
             >
               <span
                 aria-hidden="true"
@@ -37,7 +41,7 @@ function CategoryMenu({ onSelect }) {
                 {category.icon}
               </span>
               <span>{category.label}</span>
-            </button>
+            </Button>
           ))}
         </div>
       </div>
