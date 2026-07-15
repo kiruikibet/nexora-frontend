@@ -1,5 +1,5 @@
-import Navbar from "../components/layout/navigation/Navbar";
-import CategoryMenu from "../components/layout/navigation/CategoryMenu";
+import Navbar from "../components/navigation/Navbar";
+import CategoryMenu from "../components/navigation/CategoryMenu";
 
 function Header() {
   return (
