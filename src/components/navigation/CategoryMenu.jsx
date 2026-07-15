@@ -1,4 +1,4 @@
-import Button from "../common/button";
+import Button from "../common/Button";
 
 const categories = [
   { label: "All Categories", icon: "◌" },
@@ -23,24 +23,39 @@ function CategoryMenu({ onSelect }) {
       aria-label="Marketplace categories"
       className="border-t border-slate-200 bg-white"
     >
-      <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6 lg:px-8">
-        <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+      <div className="mx-auto max-w-7xl px-3 py-1  sm:px-6 sm:py-3 lg:px-8">
+        <div className="flex gap-2 overflow-x-auto [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
           {categories.map((category) => (
             <Button
               key={category.label}
               type="button"
               onClick={() => onSelect?.(category.label)}
               variant="outline"
-              size="small"
-              className="inline-flex shrink-0 items-center gap-2 rounded-full bg-slate-50 px-4 py-2 text-sm font-medium text-slate-700 transition hover:border-slate-300 hover:bg-white hover:text-slate-950"
+              shape="pill"
+              size="xs"
+              className="
+                shrink-0
+                bg-slate-50
+                text-slate-700
+                hover:bg-white
+                hover:border-slate-300
+                hover:text-slate-950
+                px-3
+                py-1
+                text-xs
+                md:px-4
+                md:py-2
+                md:text-sm
+              "
             >
               <span
                 aria-hidden="true"
-                className="text-base leading-none text-slate-500"
+                className="text-xs leading-none text-slate-500 md:text-sm"
               >
                 {category.icon}
               </span>
-              <span>{category.label}</span>
+
+              <span className="whitespace-nowrap">{category.label}</span>
             </Button>
           ))}
         </div>

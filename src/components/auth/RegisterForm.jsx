@@ -54,8 +54,8 @@ function RegisterForm({ onSubmit }) {
     "h-11 w-full rounded-lg border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10";
 
   return (
-    <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-      <div className="grid gap-5 sm:grid-cols-2">
+    <form className="space-y-1" onSubmit={handleSubmit} noValidate>
+      <div className="grid  sm:grid-cols-2">
         <Field label="Username" id="username" error={errors.username}>
           <input
             id="username"
@@ -87,7 +87,7 @@ function RegisterForm({ onSubmit }) {
         </Field>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid sm:grid-cols-2">
         <Field label="Last Name" id="lastName" error={errors.lastName}>
           <input
             id="lastName"
@@ -119,7 +119,7 @@ function RegisterForm({ onSubmit }) {
         </Field>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2">
+      <div className="grid sm:grid-cols-2">
         <Field label="Password" id="password" error={errors.password}>
           <input
             id="password"
@@ -195,10 +195,7 @@ function RegisterForm({ onSubmit }) {
 function Field({ label, id, error, children }) {
   return (
     <div>
-      <label
-        htmlFor={id}
-        className="mb-2 block text-sm font-medium text-slate-700"
-      >
+      <label htmlFor={id} className=" block text-sm font-medium text-slate-700">
         {label}
       </label>
       {children}

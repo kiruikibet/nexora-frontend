@@ -1,30 +1,49 @@
+import { forwardRef } from "react";
+
 import Spinner from "../Spinner";
+
 import {
   buttonBase,
-  sizeClasses,
   variantClasses,
+  sizeClasses,
   widthClasses,
+  shapeClasses,
 } from "./ButtonVariants";
 
-function Button({
-  children,
-  variant = "primary",
-  size = "medium",
-  width,
-  type = "button",
-  loading = false,
-  disabled = false,
-  fullWidth = false,
-  onClick,
-  className = "",
-  ...props
-}) {
+const Button = forwardRef(function Button(
+  {
+    children,
+    variant = "primary",
+    size = "medium",
+    shape = "default",
+    width,
+    fullWidth = false,
+
+    type = "button",
+
+    loading = false,
+    disabled = false,
+
+    onClick,
+    className = "",
+
+    ...props
+  },
+  ref,
+) {
   const resolvedWidth = width ?? (fullWidth ? "full" : "auto");
+
   const isDisabled = disabled || loading;
-  const spinnerColor = variant === "primary" ? "white" : "neutral";
+
+  const spinnerColor = ["primary", "danger", "success", "dark"].includes(
+    variant,
+  )
+    ? "white"
+    : "neutral";
 
   return (
     <button
+      ref={ref}
       type={type}
       onClick={onClick}
       disabled={isDisabled}
@@ -33,29 +52,36 @@ function Button({
       {...props}
       className={[
         buttonBase,
-        variantClasses[variant] || variantClasses.primary,
-        sizeClasses[size] || sizeClasses.medium,
-        widthClasses[resolvedWidth] || widthClasses.auto,
+        variantClasses[variant] ?? variantClasses.primary,
+        sizeClasses[size] ?? sizeClasses.medium,
+        widthClasses[resolvedWidth] ?? widthClasses.auto,
+        shapeClasses[shape] ?? shapeClasses.default,
         className,
       ]
         .filter(Boolean)
         .join(" ")}
     >
       <span
-        className={loading ? "invisible inline-flex items-center" : undefined}
+        className={[
+          "inline-flex items-center gap-2 whitespace-nowrap",
+          loading && "invisible",
+        ]
+          .filter(Boolean)
+          .join(" ")}
       >
         {children}
       </span>
-      {loading ? (
+
+      {loading && (
         <span
           className="absolute inset-0 flex items-center justify-center"
           aria-hidden="true"
         >
           <Spinner size="small" color={spinnerColor} />
         </span>
-      ) : null}
+      )}
     </button>
   );
-}
+});
 
 export default Button;
