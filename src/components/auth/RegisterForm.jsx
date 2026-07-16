@@ -1,5 +1,6 @@
 import { useState } from "react";
-import Button from "../common/button";
+import Button from "../common/Button";
+import { inputBase, fieldLabel, fieldError } from "../../styles";
 
 function RegisterForm({ onSubmit }) {
   const [formData, setFormData] = useState({
@@ -25,10 +26,8 @@ function RegisterForm({ onSubmit }) {
     const nextErrors = {};
 
     if (!formData.username.trim()) nextErrors.username = "Choose a username.";
-    if (!formData.firstName.trim())
-      nextErrors.firstName = "Enter your first name.";
-    if (!formData.lastName.trim())
-      nextErrors.lastName = "Enter your last name.";
+    if (!formData.firstName.trim()) nextErrors.firstName = "Enter your first name.";
+    if (!formData.lastName.trim()) nextErrors.lastName = "Enter your last name.";
     if (!formData.email.trim()) nextErrors.email = "Enter your email address.";
     if (!formData.password.trim()) nextErrors.password = "Create a password.";
     if (formData.password !== formData.confirmPassword) {
@@ -50,12 +49,9 @@ function RegisterForm({ onSubmit }) {
     }
   };
 
-  const fieldClassName =
-    "h-11 w-full rounded-lg border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10";
-
   return (
     <form className="space-y-1" onSubmit={handleSubmit} noValidate>
-      <div className="grid  sm:grid-cols-2">
+      <div className="grid sm:grid-cols-2">
         <Field label="Username" id="username" error={errors.username}>
           <input
             id="username"
@@ -66,7 +62,7 @@ function RegisterForm({ onSubmit }) {
             onChange={handleChange}
             aria-invalid={Boolean(errors.username)}
             aria-describedby={errors.username ? "username-error" : undefined}
-            className={fieldClassName}
+            className={inputBase}
             placeholder="jane_doe"
           />
         </Field>
@@ -81,7 +77,7 @@ function RegisterForm({ onSubmit }) {
             onChange={handleChange}
             aria-invalid={Boolean(errors.firstName)}
             aria-describedby={errors.firstName ? "firstName-error" : undefined}
-            className={fieldClassName}
+            className={inputBase}
             placeholder="Jane"
           />
         </Field>
@@ -98,7 +94,7 @@ function RegisterForm({ onSubmit }) {
             onChange={handleChange}
             aria-invalid={Boolean(errors.lastName)}
             aria-describedby={errors.lastName ? "lastName-error" : undefined}
-            className={fieldClassName}
+            className={inputBase}
             placeholder="Doe"
           />
         </Field>
@@ -113,7 +109,7 @@ function RegisterForm({ onSubmit }) {
             onChange={handleChange}
             aria-invalid={Boolean(errors.email)}
             aria-describedby={errors.email ? "email-error" : undefined}
-            className={fieldClassName}
+            className={inputBase}
             placeholder="jane@example.com"
           />
         </Field>
@@ -130,16 +126,12 @@ function RegisterForm({ onSubmit }) {
             onChange={handleChange}
             aria-invalid={Boolean(errors.password)}
             aria-describedby={errors.password ? "password-error" : undefined}
-            className={fieldClassName}
+            className={inputBase}
             placeholder="••••••••"
           />
         </Field>
 
-        <Field
-          label="Confirm Password"
-          id="confirmPassword"
-          error={errors.confirmPassword}
-        >
+        <Field label="Confirm Password" id="confirmPassword" error={errors.confirmPassword}>
           <input
             id="confirmPassword"
             name="confirmPassword"
@@ -148,10 +140,8 @@ function RegisterForm({ onSubmit }) {
             value={formData.confirmPassword}
             onChange={handleChange}
             aria-invalid={Boolean(errors.confirmPassword)}
-            aria-describedby={
-              errors.confirmPassword ? "confirmPassword-error" : undefined
-            }
-            className={fieldClassName}
+            aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
+            className={inputBase}
             placeholder="••••••••"
           />
         </Field>
@@ -163,7 +153,7 @@ function RegisterForm({ onSubmit }) {
           name="accountType"
           value={formData.accountType}
           onChange={handleChange}
-          className={fieldClassName}
+          className={inputBase}
         >
           <option value="buyer">Buyer</option>
           <option value="seller">Seller</option>
@@ -173,7 +163,7 @@ function RegisterForm({ onSubmit }) {
       <div className="text-sm">
         <a
           href="#login"
-          className="font-medium text-slate-700 transition hover:text-slate-900"
+          className="font-medium text-secondary transition hover:text-body"
         >
           Already have an account? Sign In
         </a>
@@ -195,11 +185,11 @@ function RegisterForm({ onSubmit }) {
 function Field({ label, id, error, children }) {
   return (
     <div>
-      <label htmlFor={id} className=" block text-sm font-medium text-slate-700">
+      <label htmlFor={id} className={fieldLabel}>
         {label}
       </label>
       {children}
-      <p id={`${id}-error`} className="mt-1 min-h-5 text-sm text-rose-600">
+      <p id={`${id}-error`} className={fieldError}>
         {error || " "}
       </p>
     </div>

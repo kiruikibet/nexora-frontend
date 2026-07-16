@@ -1,5 +1,6 @@
 import { useState } from "react";
-import Button from "../common/button";
+import Button from "../common/Button";
+import { inputBase, fieldLabel, fieldError } from "../../styles";
 
 function LoginForm({ onSubmit }) {
   const [formData, setFormData] = useState({ identifier: "", password: "" });
@@ -42,10 +43,7 @@ function LoginForm({ onSubmit }) {
   return (
     <form className="space-y-5" onSubmit={handleSubmit} noValidate>
       <div>
-        <label
-          htmlFor="identifier"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
+        <label htmlFor="identifier" className={fieldLabel}>
           Email or Username
         </label>
         <input
@@ -57,19 +55,16 @@ function LoginForm({ onSubmit }) {
           onChange={handleChange}
           aria-invalid={Boolean(errors.identifier)}
           aria-describedby={errors.identifier ? "identifier-error" : undefined}
-          className="h-11 w-full rounded-lg border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
+          className={inputBase}
           placeholder="name@company.com"
         />
-        <p id="identifier-error" className="mt-1 min-h-5 text-sm text-rose-600">
+        <p id="identifier-error" className={fieldError}>
           {errors.identifier || " "}
         </p>
       </div>
 
       <div>
-        <label
-          htmlFor="password"
-          className="mb-2 block text-sm font-medium text-slate-700"
-        >
+        <label htmlFor="password" className={fieldLabel}>
           Password
         </label>
         <input
@@ -81,10 +76,10 @@ function LoginForm({ onSubmit }) {
           onChange={handleChange}
           aria-invalid={Boolean(errors.password)}
           aria-describedby={errors.password ? "password-error" : undefined}
-          className="h-11 w-full rounded-lg border border-slate-300 bg-white px-4 text-sm text-slate-900 outline-none transition focus:border-slate-900 focus:ring-2 focus:ring-slate-900/10"
+          className={inputBase}
           placeholder="••••••••"
         />
-        <p id="password-error" className="mt-1 min-h-5 text-sm text-rose-600">
+        <p id="password-error" className={fieldError}>
           {errors.password || " "}
         </p>
       </div>
@@ -92,13 +87,13 @@ function LoginForm({ onSubmit }) {
       <div className="flex items-center justify-between gap-3 text-sm">
         <a
           href="#forgot-password"
-          className="font-medium text-slate-700 transition hover:text-slate-900"
+          className="font-medium text-secondary transition hover:text-body"
         >
           Forgot Password?
         </a>
         <a
           href="#register"
-          className="font-medium text-slate-700 transition hover:text-slate-900"
+          className="font-medium text-secondary transition hover:text-body"
         >
           Create Account
         </a>

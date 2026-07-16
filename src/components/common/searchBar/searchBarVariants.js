@@ -25,4 +25,4 @@ export const searchBarSizes = {
 };
 
 export const searchBarBase =
-  "flex w-full overflow-hidden rounded-full border border-slate-200 bg-white shadow-sm transition-all duration-200 focus-within:border-slate-300 focus-within:ring-2 focus-within:ring-slate-900/5";
+  "flex w-full overflow-hidden rounded-pill border border-border bg-surface shadow-card transition-all duration-200 focus-within:border-border-strong focus-within:ring-2 focus-within:ring-brand/5";

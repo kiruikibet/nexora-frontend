@@ -17,12 +17,12 @@ function DropdownItem({
 
   const baseClasses = [
     "flex w-full items-center gap-3 px-4 py-3 text-sm transition-colors",
-    "focus:outline-none focus:bg-slate-100",
+    "focus:outline-none focus:bg-brand-muted",
     disabled
       ? "cursor-not-allowed opacity-50"
       : danger
-        ? "text-red-600 hover:bg-red-50"
-        : "text-slate-700 hover:bg-slate-100",
+        ? "text-danger hover:bg-red-50"
+        : "text-slate-700 hover:bg-brand-muted",
     className,
   ]
     .filter(Boolean)
@@ -43,7 +43,7 @@ function DropdownItem({
     <>
       {/* Left Icon */}
       {icon && (
-        <span className="flex h-5 w-5 shrink-0 items-center justify-center text-slate-500">
+        <span className="flex h-5 w-5 shrink-0 items-center justify-center text-muted">
           <Icon icon={icon} size={18} strokeWidth={2} />
         </span>
       )}
@@ -53,13 +53,13 @@ function DropdownItem({
 
       {/* Badge */}
       {badge && (
-        <span className="rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600">
+        <span className="rounded-pill bg-brand-muted px-2 py-0.5 text-xs font-medium text-slate-600">
           {badge}
         </span>
       )}
 
       {/* Shortcut */}
-      {shortcut && <span className="text-xs text-slate-400">{shortcut}</span>}
+      {shortcut && <span className="text-xs text-subtle">{shortcut}</span>}
     </>
   );
 

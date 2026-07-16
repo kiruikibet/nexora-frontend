@@ -1,5 +1,5 @@
 export const avatarBase =
-  "relative inline-flex items-center justify-center overflow-hidden rounded-full select-none font-semibold bg-slate-900 text-white";
+  "relative inline-flex items-center justify-center overflow-hidden rounded-pill select-none font-semibold bg-brand text-inverted";
 
 export const avatarSizes = {
   small: "h-8 w-8 text-xs",

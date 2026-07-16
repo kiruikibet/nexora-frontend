@@ -1,3 +1,5 @@
+import { pageContainer } from "../styles";
+
 const footerSections = [
   { title: "Company", links: ["About", "Careers", "Contact"] },
   {
@@ -13,8 +15,8 @@ const footerSections = [
 
 function Footer() {
   return (
-    <footer className="border-t border-slate-200 bg-slate-950 text-slate-300">
-      <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <footer className="border-t border-border bg-surface-dark text-on-dark">
+      <div className={`${pageContainer} py-section`}>
         <div className="grid gap-10 md:grid-cols-2 xl:grid-cols-5">
           <div className="xl:col-span-2">
             <div className="text-lg font-semibold tracking-tight text-white">
@@ -28,7 +30,7 @@ function Footer() {
 
           {footerSections.map((section) => (
             <div key={section.title}>
-              <h2 className="text-sm font-semibold uppercase tracking-[0.18em] text-white/90">
+              <h2 className="text-sm font-semibold uppercase tracking-caps text-inverted/90">
                 {section.title}
               </h2>
               <ul className="mt-4 space-y-3 text-sm text-slate-400">

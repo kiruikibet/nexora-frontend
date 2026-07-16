@@ -1,0 +1,121 @@
+/**
+ * Nexora Design Token System
+ * ─────────────────────────────────────────────────────────────────────────────
+ * Defines all CSS custom properties (design tokens) for the Nexora frontend.
+ * These are declared inside Tailwind v4's @theme block so they become available
+ * as Tailwind utility classes automatically (e.g. bg-brand, text-muted, etc.)
+ *
+ * HOW THIS WORKS:
+ *   1. This file is imported in index.css — so every page and component gets
+ *      these tokens with zero extra imports.
+ *   2. Tailwind v4 reads the @theme block and generates utility classes from it.
+ *   3. You can also use the raw CSS variables (var(--color-brand)) anywhere in
+ *      plain CSS, inline styles, or JS via the companion `tokens.js` file.
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ * USAGE QUICK REFERENCE
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
+ * COLORS — use as Tailwind utility classes:
+ *   bg-brand          → primary brand background  (#0f172a / slate-900)
+ *   text-brand        → primary brand text
+ *   bg-brand-dark     → darker brand shade         (#020617 / slate-950)
+ *   bg-brand-muted    → subtle brand tint           (#f1f5f9 / slate-100)
+ *   text-muted        → secondary / helper text     (#64748b / slate-500)
+ *   text-body         → default body text           (#0f172a / slate-900)
+ *   bg-surface        → card / panel background     (#ffffff)
+ *   bg-surface-alt    → off-white surface           (#f8fafc / slate-50)
+ *   border-default    → standard border             (#e2e8f0 / slate-200)
+ *   border-strong     → slightly stronger border    (#cbd5e1 / slate-300)
+ *   text-danger       → error / destructive text    (#e11d48 / rose-600)
+ *   bg-danger         → error background            (#e11d48)
+ *   text-success      → success text                (#059669 / emerald-600)
+ *   bg-success        → success background          (#059669)
+ *   bg-badge          → unread / notification badge (#dc2626 / red-600)
+ *
+ * RADIUS — use as Tailwind utility classes:
+ *   rounded-card      → large card radius           (1.5rem / 24px)
+ *   rounded-panel     → medium panel radius         (1rem   / 16px)
+ *   rounded-input     → form field radius           (0.5rem / 8px)
+ *   rounded-pill      → pill shape                  (9999px)
+ *   rounded-badge     → small badge radius          (0.375rem / 6px)
+ *
+ * SHADOWS — use as Tailwind utility classes:
+ *   shadow-card       → card elevation shadow
+ *   shadow-card-lg    → heavier card shadow
+ *   shadow-navbar     → subtle navbar shadow
+ *
+ * SPACING — custom scale on top of Tailwind defaults:
+ *   p-section         → standard section padding    (4rem  / 64px)
+ *   p-section-sm      → tighter section padding     (2.5rem / 40px)
+ *   max-w-page        → max content width           (80rem / 1280px)
+ *
+ * TYPOGRAPHY:
+ *   font-sans         → overridden to Inter stack (already in body)
+ *   tracking-display  → headline letter-spacing    (-0.025em)
+ *   tracking-caps     → all-caps label spacing     (0.2em)
+ *
+ * ─────────────────────────────────────────────────────────────────────────────
+ */
+
+@theme {
+  /* ── Brand / Primary ─────────────────────────────────────── */
+  --color-brand:        #0f172a;   /* slate-900  — primary CTA, avatar bg    */
+  --color-brand-hover:  #1e293b;   /* slate-800  — brand hover state         */
+  --color-brand-dark:   #020617;   /* slate-950  — darkest brand shade       */
+  --color-brand-muted:  #f1f5f9;   /* slate-100  — tinted brand background   */
+  --color-brand-muted-hover: #e2e8f0; /* slate-200 — brand-muted hover       */
+
+  /* ── Text ────────────────────────────────────────────────── */
+  --color-body:         #0f172a;   /* slate-900  — default body copy         */
+  --color-secondary:    #334155;   /* slate-700  — secondary UI text         */
+  --color-muted:        #64748b;   /* slate-500  — secondary / helper text   */
+  --color-subtle:       #94a3b8;   /* slate-400  — placeholder / disabled    */
+  --color-inverted:     #ffffff;   /* white      — text on dark backgrounds  */
+  --color-on-dark:      #cbd5e1;   /* slate-300  — body text on dark panels  */
+
+  /* ── Surfaces ────────────────────────────────────────────── */
+  --color-surface:      #ffffff;   /* white      — card / modal bg           */
+  --color-surface-alt:  #f8fafc;   /* slate-50   — page / section bg         */
+  --color-surface-dark: #0f172a;   /* slate-900  — dark card (login panel)   */
+
+  /* ── Borders ─────────────────────────────────────────────── */
+  --color-border:       #e2e8f0;   /* slate-200  — default border            */
+  --color-border-strong: #cbd5e1;  /* slate-300  — emphasized border         */
+
+  /* ── Semantic: Danger ────────────────────────────────────── */
+  --color-danger:       #e11d48;   /* rose-600   — destructive actions       */
+  --color-danger-hover: #be123c;   /* rose-700   — hover state               */
+
+  /* ── Semantic: Success ───────────────────────────────────── */
+  --color-success:      #059669;   /* emerald-600 — positive / confirm       */
+  --color-success-hover: #047857; /* emerald-700 — hover state               */
+
+  /* ── Badge ───────────────────────────────────────────────── */
+  --color-badge:        #dc2626;   /* red-600    — notification badge        */
+
+  /* ── Border Radius ───────────────────────────────────────── */
+  --radius-card:        1.5rem;    /* 24px — large cards, auth panels        */
+  --radius-panel:       1rem;      /* 16px — inner panels, dropdowns         */
+  --radius-input:       0.5rem;    /* 8px  — form inputs                     */
+  --radius-pill:        9999px;    /* pill buttons, tags                     */
+  --radius-badge:       0.375rem;  /* 6px  — small labels / chips            */
+
+  /* ── Shadows ─────────────────────────────────────────────── */
+  --shadow-card:        0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.06);
+  --shadow-card-lg:     0 20px 60px rgba(15,23,42,0.08);
+  --shadow-navbar:      0 1px 0 rgba(15,23,42,0.06);
+
+  /* ── Spacing ─────────────────────────────────────────────── */
+  --spacing-section:    4rem;      /* 64px — vertical section padding        */
+  --spacing-section-sm: 2.5rem;    /* 40px — tighter section padding         */
+
+  /* ── Sizing ──────────────────────────────────────────────── */
+  --width-page:         80rem;     /* 1280px — max-w-page content container  */
+
+  /* ── Typography ──────────────────────────────────────────── */
+  --font-sans:          Inter, ui-sans-serif, system-ui, -apple-system,
+                        BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --tracking-display:   -0.025em;  /* tight tracking for headlines           */
+  --tracking-caps:      0.2em;     /* wide tracking for ALL-CAPS labels      */
+}
