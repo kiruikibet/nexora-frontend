@@ -5,6 +5,7 @@ import Logo from "../common/Logo";
 import SearchBar from "../common/SearchBar";
 import Button from "../common/Button";
 import Avatar from "../common/Avatar";
+import Dropdown from "../common/dropdown";
 
 import { ROUTES } from "../../constants/routes";
 
@@ -13,6 +14,8 @@ import Icon, {
   MessageCircle,
   CirclePlus,
   ChevronDown,
+  User,
+  LogOut,
 } from "../common/icons";
 
 function Navbar() {
@@ -43,7 +46,7 @@ function Navbar() {
     <header className="sticky top-0 z-40 border-b border-slate-200/80 bg-white/95 backdrop-blur">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         {/* ================= Desktop ================= */}
-        <div className="hidden md:flex items-center gap-4 py-4">
+        <div className="hidden md:flex items-center gap-4 py-2">
           {/* Logo */}
           <Link
             to={ROUTES.HOME}
@@ -59,14 +62,14 @@ function Navbar() {
             value={searchQuery}
             onChange={setSearchQuery}
             onSearch={handleSearch}
-            size="medium"
+            size="small"
           />
 
           {/* Right Side */}
           {isAuthenticated ? (
             <div className="flex shrink-0 items-center gap-3">
               {/* Sell */}
-              <Button variant="primary" shape="pill" size="small">
+              <Button variant="success" shape="pill" size="small">
                 <span className="text-sm font-bold leading-none">
                   <Icon icon={CirclePlus} size={14} strokeWidth={1.75} />
                 </span>
@@ -96,19 +99,59 @@ function Navbar() {
               </button>
 
               {/* Profile */}
-              <button className="flex items-center gap-2 rounded-full px-2 py-1 transition hover:bg-slate-100">
-                <Avatar
-                  src={user.avatar}
-                  name={`${user.firstName} ${user.lastName}`}
-                  size="small"
-                />
+              <Dropdown align="right">
+                <Dropdown.Trigger>
+                  <button className="flex items-center gap-2 rounded-full px-2 py-1 transition hover:bg-slate-100">
+                    <Avatar
+                      src={user.avatar}
+                      name={`${user.firstName} ${user.lastName}`}
+                      size="small"
+                    />
 
-                <span className="font-medium text-slate-700">
-                  {user.firstName}
-                </span>
+                    <span className="font-medium text-slate-700">
+                      {user.firstName}
+                    </span>
 
-                <Icon icon={ChevronDown} size={18} />
-              </button>
+                    <Icon icon={ChevronDown} size={18} />
+                  </button>
+                </Dropdown.Trigger>
+
+                <Dropdown.Menu>
+                  <Dropdown.Header>
+                    <div className="flex items-center gap-3">
+                      <Avatar
+                        src={user.avatar}
+                        name={`${user.firstName} ${user.lastName}`}
+                        size="medium"
+                      />
+
+                      <div>
+                        <p className="font-semibold text-slate-900">
+                          {user.firstName} {user.lastName}
+                        </p>
+
+                        <p className="text-sm text-slate-500">
+                          emmanuel@nexora.com
+                        </p>
+                      </div>
+                    </div>
+                  </Dropdown.Header>
+
+                  <Dropdown.Item icon={User} to={ROUTES.PROFILE}>
+                    Dashboard
+                  </Dropdown.Item>
+
+                  <Dropdown.Divider />
+
+                  <Dropdown.Item
+                    icon={LogOut}
+                    danger
+                    onClick={() => console.log("Logout")}
+                  >
+                    Logout
+                  </Dropdown.Item>
+                </Dropdown.Menu>
+              </Dropdown>
             </div>
           ) : (
             <div className="flex shrink-0 items-center gap-3">
@@ -150,7 +193,7 @@ function Navbar() {
             {/* Right Side */}
             {isAuthenticated ? (
               <div className="flex items-center gap-2">
-                <Button variant="primary" shape="pill" size="small">
+                <Button variant="success" shape="pill" size="small">
                   <span className="text-sm font-bold leading-none">
                     <Icon icon={CirclePlus} size={14} strokeWidth={1.75} />
                   </span>
@@ -176,11 +219,52 @@ function Navbar() {
                   )}
                 </button>
 
-                <Avatar
-                  src={user.avatar}
-                  name={`${user.firstName} ${user.lastName}`}
-                  size="small"
-                />
+                <Dropdown align="right">
+                  <Dropdown.Trigger>
+                    <button className="flex items-center gap-2 rounded-full px-2 py-1 transition hover:bg-slate-100">
+                      <Avatar
+                        src={user.avatar}
+                        name={`${user.firstName} ${user.lastName}`}
+                        size="small"
+                      />
+                    </button>
+                  </Dropdown.Trigger>
+                  <Dropdown.Menu width="w-48 sm:w-72">
+                    <Dropdown.Header>
+                      <div className="flex w-full items-center gap-3 px-3">
+                        <Avatar
+                          src={user.avatar}
+                          name={`${user.firstName} ${user.lastName}`}
+                          size="small"
+                        />
+
+                        <div className="min-w-0 flex-1">
+                          <p className="truncate font-semibold text-slate-900">
+                            {user.firstName} {user.lastName}
+                          </p>
+
+                          <p className="truncate text-sm text-slate-500">
+                            emmanuel@nexora.com
+                          </p>
+                        </div>
+                      </div>
+                    </Dropdown.Header>
+
+                    <Dropdown.Item icon={User} to={ROUTES.PROFILE}>
+                      Dashboard
+                    </Dropdown.Item>
+
+                    <Dropdown.Divider />
+
+                    <Dropdown.Item
+                      icon={LogOut}
+                      danger
+                      onClick={() => console.log("Logout")}
+                    >
+                      Logout
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
               </div>
             ) : (
               <div className="flex items-center gap-3">

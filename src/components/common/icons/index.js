@@ -5,4 +5,6 @@ export {
   MessageCircle,
   CirclePlus,
   ChevronDown,
+  User,
+  LogOut,
 } from "lucide-react";
