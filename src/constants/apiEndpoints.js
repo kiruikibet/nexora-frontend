@@ -13,4 +13,8 @@ export const API_ENDPOINTS = Object.freeze({
     REFRESH: "/accounts/token/refresh/",
     PROFILE: "/accounts/profile/",
   },
+
+  MARKETING: {
+    ADVERTISEMENTS_HOMEPAGE: "/marketing/advertisements/homepage/",
+  },
 });
