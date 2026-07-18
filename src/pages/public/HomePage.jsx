@@ -1,6 +1,6 @@
 import Header from "../../layouts/Header";
 import Footer from "../../layouts/Footer";
-import Button from "../../components/common/button";
+import { AdvertisementSection } from "../../marketing/advertisements";
 
 const architectureColumns = [
   {
@@ -21,11 +21,15 @@ const architectureColumns = [
 function HomePage() {
   return (
     <div className="min-h-screen bg-[radial-gradient(circle_at_top,_rgba(15,23,42,0.08),_transparent_35%),linear-gradient(180deg,_#f8fafc_0%,_#ffffff_100%)] text-body">
-      <div className="sticky top-0">
+      <div className="sticky top-0 z-40">
         <Header />
       </div>
 
       <main>
+        <div className="relative z-0 py-4">
+          <AdvertisementSection />
+        </div>
+
         <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8 lg:py-24">
           <div className="grid items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
             <div>

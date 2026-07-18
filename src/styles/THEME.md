@@ -1,206 +1,256 @@
 # Nexora Theme System
 
-A single source of truth for every color, radius, shadow, spacing, and reusable class string across the Nexora frontend. Defined once, used everywhere — no repeated values, no drift between components.
+This document explains how the theme works, the different ways you can use it, and why each approach exists.
 
 ---
 
-## File Structure
+## How It All Fits Together
+
+The theme lives in three files:
 
 ```
 src/styles/
-  theme.css    — CSS custom properties inside Tailwind v4's @theme block
-  tokens.js    — Same values as JS exports + reusable Tailwind class strings
-src/index.css  — Imports theme.css once, making all tokens globally available
+  theme.css   — defines every design value as a CSS variable inside Tailwind's @theme block
+  tokens.js   — mirrors those values as JavaScript exports + pre-built reusable class strings
+  index.js    — the single entry point: imports theme.css and re-exports everything from tokens.js
 ```
 
-`theme.css` is imported in `index.css`, which is loaded in `main.jsx`. Every component and page gets the tokens automatically — no per-file imports needed for Tailwind classes.
+And it plugs into the app here:
+
+```
+src/index.css     ← imports theme.css  (loads all CSS tokens globally)
+src/main.jsx      ← imports index.css  (runs once when the app starts)
+```
+
+Because `main.jsx` loads `index.css` which loads `theme.css`, every CSS token is available globally across the entire app from the moment the app boots. No component ever needs to import a CSS file to get the design tokens.
 
 ---
 
-## Two Ways to Use the Theme
+## The 4 Ways to Use the Theme
 
-### 1. Tailwind utility classes (primary usage)
+### Way 1 — Tailwind classes directly in JSX (most common, no import needed)
 
-Tailwind v4 reads the `@theme` block in `theme.css` and auto-generates utility classes from every token. Use them exactly like standard Tailwind classes in JSX.
+This is what you use 90% of the time. Because `theme.css` is loaded globally, Tailwind generates utility classes from every token automatically. You use them exactly like normal Tailwind classes — just write them in `className`.
 
 ```jsx
+// No import needed — these classes are available in every component automatically
 <div className="bg-surface border border-border rounded-card shadow-card p-6">
   <h2 className="text-body font-semibold">Title</h2>
   <p className="text-muted text-sm">Helper text</p>
+  <span className="bg-brand text-inverted rounded-pill px-3 py-1 text-xs">Badge</span>
 </div>
 ```
 
-No imports required. The classes are available globally.
+Why: Tailwind is a utility-first framework. Writing classes directly in JSX is the intended pattern — it keeps styles co-located with markup and requires zero setup per file. Since the tokens are loaded globally, you never have to think about where to import them.
 
-### 2. Reusable class strings from `tokens.js` (for repeated patterns)
+---
 
-For patterns that repeat across multiple components — form inputs, page containers, nav icon buttons — import the pre-built class strings from `tokens.js`. This prevents the same 80-character class string from being copy-pasted everywhere.
+### Way 2 — Reusable class strings from `tokens.js` (for patterns that repeat)
+
+Some patterns are used identically across many components — a form input, a page container, a nav icon button. Writing the same 80-character class string in 10 different places is fragile: if you want to change the input style, you have to find and update every occurrence.
+
+The solution is to define those patterns once as exported strings in `tokens.js`, then import and use them wherever needed.
 
 ```js
-import { inputBase, fieldLabel, fieldError, pageContainer } from "../styles/tokens";
+import { inputBase, fieldLabel, fieldError, pageContainer } from "../styles";
 ```
 
 ```jsx
+// Every form across the app uses the exact same input style
 <label className={fieldLabel}>Email</label>
 <input className={inputBase} type="email" />
 <p className={fieldError}>{error || " "}</p>
+
+// Every page uses the exact same container width and padding
+<div className={pageContainer}>…</div>
+
+// Extend by composing with extra classes
+<input className={`${inputBase} pl-10`} />  // add left padding for an icon
+<div className={`${card} p-6`}>…</div>      // add padding to a card
 ```
 
-### 3. Raw JS values (for inline styles and third-party libs)
+The import path is `"../styles"` (or `"../../styles"` depending on depth), not `"../styles/tokens"`. That works because `styles/index.js` re-exports everything from `tokens.js`, so the folder itself is the entry point.
 
-When you need token values outside of Tailwind — charting libraries, canvas, animation configs, dynamic inline styles — import the raw values from `tokens.js`.
+Why: One change in `tokens.js` updates every component that uses that string. It also makes components easier to read — `className={inputBase}` is immediately clear, whereas a 6-condition class string inline is not.
 
-```js
-import { colors, radius, shadows } from "../styles/tokens";
-
-<div style={{ backgroundColor: colors.surfaceAlt, borderRadius: radius.card }} />
-```
+**Currently used in:**
+- `LoginForm.jsx` — `inputBase`, `fieldLabel`, `fieldError`
+- `RegisterForm.jsx` — `inputBase`, `fieldLabel`, `fieldError`
+- `Navbar.jsx` — `navIconBtn`, `notifBadge`, `notifBadgeSm`
+- `Footer.jsx` — `pageContainer`
+- `HomePage.jsx` — `pageContainer`, `cardLg`, `capsHeading`, `displayHeading`
 
 ---
 
-## Design Tokens Reference
+### Way 3 — Raw CSS variables in plain CSS files
 
-### Colors
+When you're writing actual CSS (in `.css` files or `<style>` blocks) rather than Tailwind classes, you reference the tokens as CSS custom properties using `var()`.
 
-All available as `bg-*`, `text-*`, and `border-*` Tailwind classes.
+```css
+/* In any .css file */
+.my-element {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  color: var(--color-body);
+}
 
-| Token | Tailwind class | Hex | When to use |
-|---|---|---|---|
-| brand | `bg-brand` / `text-brand` | `#0f172a` | Primary CTAs, avatar bg, active states |
-| brand-hover | — (hover variant) | `#1e293b` | Brand hover state |
-| brand-dark | `bg-brand-dark` | `#020617` | Dark panels, footer bg |
-| brand-muted | `bg-brand-muted` | `#f1f5f9` | Tinted backgrounds, hover states on light |
-| brand-muted-hover | — (hover variant) | `#e2e8f0` | Hovered brand-muted areas |
-| body | `text-body` | `#0f172a` | Default body copy |
-| secondary | `text-secondary` | `#334155` | Secondary UI text, nav links |
-| muted | `text-muted` | `#64748b` | Captions, helper text, icon labels |
-| subtle | `text-subtle` | `#94a3b8` | Placeholders, disabled text |
-| inverted | `text-inverted` | `#ffffff` | Text on dark backgrounds |
-| on-dark | `text-on-dark` | `#cbd5e1` | Body text on dark panels (footer) |
-| surface | `bg-surface` | `#ffffff` | Cards, modals, inputs |
-| surface-alt | `bg-surface-alt` | `#f8fafc` | Page bg, section bg, inner panels |
-| surface-dark | `bg-surface-dark` | `#0f172a` | Dark card panels |
-| border | `border-border` | `#e2e8f0` | Default borders |
-| border-strong | `border-border-strong` | `#cbd5e1` | Emphasized borders, input borders |
-| danger | `text-danger` / `bg-danger` | `#e11d48` | Errors, destructive actions |
-| danger-hover | — (hover variant) | `#be123c` | Danger hover state |
-| success | `text-success` / `bg-success` | `#059669` | Confirmations, positive feedback |
-| success-hover | — (hover variant) | `#047857` | Success hover state |
-| badge | `bg-badge` | `#dc2626` | Notification / unread count badges |
+.my-element:hover {
+  background-color: var(--color-surface-alt);
+  border-color: var(--color-border-strong);
+}
+```
 
-### Border Radius
+All variable names follow this pattern:
+- Colors → `--color-{name}` (e.g. `--color-brand`, `--color-danger`)
+- Radius → `--radius-{name}` (e.g. `--radius-card`, `--radius-pill`)
+- Shadows → `--shadow-{name}` (e.g. `--shadow-card`)
+- Spacing → `--spacing-{name}` (e.g. `--spacing-section`)
+- Widths → `--width-{name}` (e.g. `--width-page`)
+- Typography → `--font-{name}`, `--tracking-{name}`
 
-| Token | Tailwind class | Value | When to use |
-|---|---|---|---|
-| card | `rounded-card` | `1.5rem` | Large cards, auth panels, hero boxes |
-| panel | `rounded-panel` | `1rem` | Inner panels, dropdowns, modals |
-| input | `rounded-input` | `0.5rem` | Form inputs, selects, textareas |
-| pill | `rounded-pill` | `9999px` | Pill buttons, tags, avatar, badges |
-| badge | `rounded-badge` | `0.375rem` | Small chips, labels |
-
-### Shadows
-
-| Token | Tailwind class | When to use |
-|---|---|---|
-| card | `shadow-card` | Standard card elevation |
-| card-lg | `shadow-card-lg` | Hero sections, featured cards, auth panels |
-| navbar | `shadow-navbar` | Sticky navigation bar |
-
-### Spacing
-
-| Token | Tailwind class | Value | When to use |
-|---|---|---|---|
-| section | `py-section` / `p-section` | `4rem` | Vertical section padding |
-| section-sm | `py-section-sm` | `2.5rem` | Tighter section padding on small viewports |
-| page width | `max-w-page` | `80rem` | Main content container max-width |
-
-### Typography
-
-| Token | Tailwind class | Value | When to use |
-|---|---|---|---|
-| font-sans | `font-sans` | Inter stack | Already applied to `<body>` globally |
-| tracking-display | `tracking-display` | `-0.025em` | Large headlines and display text |
-| tracking-caps | `tracking-caps` | `0.2em` | ALL-CAPS labels, category badges |
+Why: Some situations don't work with Tailwind classes — third-party component overrides, keyframe animations, pseudo-element styles, or CSS Modules. `var()` lets you stay on-token without needing Tailwind.
 
 ---
 
-## Reusable Class Strings
+### Way 4 — Raw JS values for inline styles and third-party libraries
 
-Import these from `tokens.js` to avoid repeating long class strings across components.
-
-### `inputBase`
-
-Standard form input, select, or textarea. Includes focus ring, error state via `aria-invalid`, disabled state.
+Tailwind classes and CSS variables don't work everywhere. Charting libraries, animation configs (GSAP, Framer Motion), canvas drawing, and dynamic `style` attributes all need actual JavaScript values. For those cases, import the raw values from `tokens.js`.
 
 ```js
-import { inputBase } from "../styles/tokens";
+import { colors, radius, shadows, spacing } from "../styles";
 ```
 
 ```jsx
-<input className={inputBase} type="text" />
-<input className={`${inputBase} pl-10`} type="text" />  // with a left icon
-<select className={inputBase}>…</select>
-<textarea className={inputBase} />
+// Dynamic inline style
+<div style={{ backgroundColor: colors.surfaceAlt, borderRadius: radius.card }} />
+
+// Framer Motion
+<motion.div animate={{ backgroundColor: colors.brand }} />
+
+// A charting library (Recharts, Chart.js, etc.)
+const chartConfig = {
+  colors: [colors.brand, colors.success, colors.danger],
+  borderRadius: radius.badge,
+};
+
+// Canvas drawing
+ctx.fillStyle = colors.brand;
+ctx.strokeStyle = colors.border;
 ```
 
-Used in: `LoginForm.jsx`, `RegisterForm.jsx`
+Why: JavaScript libraries can't read Tailwind class names or CSS variables — they need real hex values and pixel/rem strings. The `tokens.js` values are the exact same numbers that `theme.css` uses, so your JS-driven visuals stay in sync with your CSS.
 
 ---
 
-### `fieldLabel`
+## All Available Tokens
 
-Form field label — `mb-1.5 block text-sm font-medium text-secondary`.
+### Colors
+
+| Tailwind class | JS key (`colors.*`) | Value | Use for |
+|---|---|---|---|
+| `bg-brand` / `text-brand` | `brand` | `#0f172a` | Primary CTAs, avatar backgrounds |
+| `bg-brand-hover` | `brandHover` | `#1e293b` | Brand hover states |
+| `bg-brand-dark` | `brandDark` | `#020617` | Darkest brand — footer, dark panels |
+| `bg-brand-muted` | `brandMuted` | `#f1f5f9` | Tinted bg, hover on light surfaces |
+| `text-body` | `body` | `#0f172a` | Default body copy |
+| `text-secondary` | `secondary` | `#334155` | Secondary UI text, nav links, labels |
+| `text-muted` | `muted` | `#64748b` | Captions, helper text, icon labels |
+| `text-subtle` | `subtle` | `#94a3b8` | Placeholders, disabled text |
+| `text-inverted` | `inverted` | `#ffffff` | Text on dark backgrounds |
+| `text-on-dark` | `onDark` | `#cbd5e1` | Body text inside dark panels (footer) |
+| `bg-surface` | `surface` | `#ffffff` | Cards, modals, inputs |
+| `bg-surface-alt` | `surfaceAlt` | `#f8fafc` | Page bg, section bg, inner panels |
+| `bg-surface-dark` | `surfaceDark` | `#0f172a` | Dark panels — footer, auth panels |
+| `border-border` | `border` | `#e2e8f0` | Default borders everywhere |
+| `border-border-strong` | `borderStrong` | `#cbd5e1` | Emphasized borders, input borders |
+| `text-danger` / `bg-danger` | `danger` | `#e11d48` | Errors, destructive actions |
+| `text-success` / `bg-success` | `success` | `#059669` | Confirmations, positive feedback |
+| `bg-badge` | `badge` | `#dc2626` | Notification / unread count badges |
+
+### Border Radius
+
+| Tailwind class | JS key (`radius.*`) | Value | Use for |
+|---|---|---|---|
+| `rounded-card` | `card` | `1.5rem` | Large cards, auth panels, hero boxes |
+| `rounded-panel` | `panel` | `1rem` | Inner panels, dropdowns, modals |
+| `rounded-input` | `input` | `0.5rem` | Form inputs, selects, textareas |
+| `rounded-pill` | `pill` | `9999px` | Pill buttons, avatar, badges, tags |
+| `rounded-badge` | `badge` | `0.375rem` | Small chips, status labels |
+
+### Shadows
+
+| Tailwind class | JS key (`shadows.*`) | Use for |
+|---|---|---|
+| `shadow-card` | `card` | Standard card elevation |
+| `shadow-card-lg` | `cardLg` | Hero sections, auth panels, featured cards |
+| `shadow-navbar` | `navbar` | Sticky navigation bar |
+
+### Spacing
+
+| Tailwind class | JS key (`spacing.*`) | Value | Use for |
+|---|---|---|---|
+| `py-section` / `p-section` | `section` | `4rem` | Vertical section padding |
+| `py-section-sm` | `sectionSm` | `2.5rem` | Tighter padding on smaller viewports |
+| `max-w-page` | `widths.page` | `80rem` | Main content container max-width |
+
+### Typography
+
+| Tailwind class | Value | Use for |
+|---|---|---|
+| `font-sans` | Inter stack | Applied to `<body>` globally — rarely need to write this |
+| `tracking-display` | `-0.025em` | Large headlines and display text |
+| `tracking-caps` | `0.2em` | ALL-CAPS labels, category badges |
+
+---
+
+## Reusable Class Strings Reference
+
+These are all exported from `tokens.js` and available via `import { ... } from "../styles"`.
+
+### `inputBase`
+Standard form input, select, or textarea. Includes focus ring, error state, and disabled state.
+
+```jsx
+<input className={inputBase} />
+<input className={`${inputBase} pl-10`} />   // with a left icon
+<select className={inputBase}>…</select>
+```
+
+### `fieldLabel`
+Form field label — consistent size, weight, and color.
 
 ```jsx
 <label htmlFor="email" className={fieldLabel}>Email</label>
 ```
 
-Used in: `LoginForm.jsx`, `RegisterForm.jsx`
-
----
-
 ### `fieldError`
-
-Error message below a field. Always render it (even empty) to prevent layout shift.
+Error message below a field. Always render it even when empty (the `min-h` prevents layout shift).
 
 ```jsx
 <p id="email-error" className={fieldError}>{error || " "}</p>
 ```
 
-Used in: `LoginForm.jsx`, `RegisterForm.jsx`
-
----
-
 ### `pageContainer`
-
-Centered, max-width content wrapper with responsive horizontal padding.
+Centered, responsive content wrapper used on every page and layout.
 
 ```jsx
 <div className={pageContainer}>…</div>
-
-// With vertical padding
-<section className={`${pageContainer} py-section`}>…</section>
+<section className={`${pageContainer} py-16`}>…</section>
 ```
 
-Used in: `Navbar.jsx`, `Footer.jsx`, `HomePage.jsx` (via section wrapper)
-
----
-
 ### `sectionPadding`
-
-Vertical section rhythm — `py-section` (4rem top + bottom).
+Vertical section rhythm — `py-section` (4rem top and bottom).
 
 ```jsx
-<section className={`${sectionPadding}`}>
+<section className={sectionPadding}>
   <div className={pageContainer}>…</div>
 </section>
 ```
 
----
-
 ### `navIconBtn`
-
-Icon button used in the navbar (messages, notifications, etc.). Includes focus ring and hover state.
+Icon button for the navbar (bell, messages, etc.). Handles hover, focus ring, and positioning for a badge.
 
 ```jsx
 <button className={navIconBtn} aria-label="Notifications">
@@ -209,202 +259,58 @@ Icon button used in the navbar (messages, notifications, etc.). Includes focus r
 </button>
 ```
 
-Used in: `Navbar.jsx` (messages button, notifications button)
-
----
-
 ### `notifBadge` / `notifBadgeSm`
-
-Floating unread count badge positioned over a `navIconBtn`. Use `notifBadgeSm` on mobile.
+Floating unread count badge. `notifBadge` is for desktop, `notifBadgeSm` is slightly smaller for mobile.
 
 ```jsx
-// Desktop
-<span className={notifBadge}>{unreadMessages}</span>
-
-// Mobile
-<span className={notifBadgeSm}>{unreadMessages}</span>
+<span className={notifBadge}>{unreadMessages}</span>    // desktop
+<span className={notifBadgeSm}>{unreadMessages}</span>  // mobile
 ```
 
-Used in: `Navbar.jsx` (desktop and mobile message/notification buttons)
-
----
-
 ### `card`
-
-Standard card surface — `rounded-card border border-border bg-surface shadow-card`.
+Standard card surface — border, rounded corners, white background, light shadow.
 
 ```jsx
-<div className={card}>…</div>
 <div className={`${card} p-6`}>…</div>
 ```
 
----
-
 ### `cardLg`
-
-Elevated card for hero sections and auth panels — same as `card` but with `shadow-card-lg`.
+Elevated card for hero sections and auth panels — same as `card` but with a heavier shadow.
 
 ```jsx
 <div className={`${cardLg} p-6`}>…</div>
 ```
 
-Used in: `HomePage.jsx` (architecture overview panel)
-
----
-
 ### `pillLabel`
-
-Inline pill label for category badges, status chips, and tags.
+Inline pill tag for category chips, status labels, eyebrow text.
 
 ```jsx
-<span className={pillLabel}>Marketplace</span>
+<span className={pillLabel}>Nexora Marketplace</span>
 ```
-
-Used in: `HomePage.jsx` (hero eyebrow label)
-
----
 
 ### `capsHeading`
-
-ALL-CAPS section heading — `text-xs font-semibold uppercase tracking-caps text-muted`.
+ALL-CAPS section heading — uppercase, wide letter-spacing, muted color.
 
 ```jsx
-<h2 className={capsHeading}>Featured</h2>
-<span className={capsHeading}>Presentation</span>
+<h2 className={capsHeading}>Featured Categories</h2>
 ```
 
-Used in: `HomePage.jsx` (architecture column titles), `Footer.jsx` (section headings)
-
----
-
 ### `displayHeading`
-
-Display / hero headline base — `font-semibold tracking-display text-body`. Pair with a font-size class.
+Display/hero headline base. Pair with a font-size class.
 
 ```jsx
 <h1 className={`text-5xl lg:text-6xl ${displayHeading}`}>
-  A professional marketplace frontend.
+  A professional marketplace.
 </h1>
 ```
 
-Used in: `HomePage.jsx` (hero h1)
-
----
-
 ### `cx(...classes)`
-
-Tiny class-name joiner utility. Filters falsy values so you can safely pass conditionals.
-
-```js
-import { cx } from "../styles/tokens";
-
-cx("base-class", isActive && "active", className)
-// → "base-class active extra"
-```
-
----
-
-## Component Variant Files
-
-These files live alongside their component and use design tokens for all class values.
-
-### `ButtonVariants.js`
-
-Located at `src/components/common/button/ButtonVariants.js`.
-
-Exports: `buttonBase`, `variantClasses`, `sizeClasses`, `widthClasses`, `shapeClasses`.
+Utility to join class names, filtering out any falsy values. No external dependency needed.
 
 ```js
-import { buttonBase, variantClasses, sizeClasses } from "./ButtonVariants";
+cx("base", isActive && "bg-brand", className)
+// → "base bg-brand extra"
 ```
-
-| Variant | When to use |
-|---|---|
-| `primary` | Main CTAs — Sign In, Submit, Create |
-| `secondary` | Alternative CTAs |
-| `outline` | Neutral actions — Sign In (unauthenticated nav) |
-| `ghost` | Minimal actions, inline toolbar buttons |
-| `light` | Light filled — subtle emphasis |
-| `dark` | Dark filled — inverse of primary |
-| `link` | Looks like a text link |
-| `danger` | Destructive actions — Delete, Remove |
-| `success` | Positive confirmation — Sell, Confirm |
-
-| Size | Height | When to use |
-|---|---|---|
-| `xs` | 32px | Compact toolbars |
-| `small` | 36px | Nav buttons, inline actions |
-| `medium` | 44px | Default form buttons |
-| `large` | 48px | Primary form submit buttons |
-| `xl` | 56px | Hero CTAs |
-
-| Shape | Class | When to use |
-|---|---|---|
-| `default` | `rounded-lg` | Most buttons |
-| `pill` | `rounded-full` | Sell button, tags |
-| `soft` | `rounded-xl` | Cards, panels |
-| `square` | `rounded-none` | Icon-only toolbars |
-
----
-
-### `avatarVariants.js`
-
-Located at `src/components/common/avatar/avatarVariants.js`.
-
-```js
-import { avatarBase, avatarSizes } from "./avatarVariants";
-```
-
-`avatarBase` uses `bg-brand` and `text-inverted` tokens — circular, brand-colored with white initials.
-
-| Size | Dimensions | When to use |
-|---|---|---|
-| `small` | 32×32px | Navbar compact avatar |
-| `medium` | 40×40px | Dropdown header |
-| `large` | 56×56px | Profile pages |
-| `xlarge` | 80×80px | Profile hero |
-
----
-
-### `searchBarVariants.js`
-
-Located at `src/components/common/searchBar/searchBarVariants.js`.
-
-```js
-import { searchBarBase, searchBarSizes } from "./searchBarVariants";
-```
-
-`searchBarBase` uses `rounded-pill`, `border-border`, `bg-surface`, and `shadow-card` tokens — pill-shaped search container with focus ring.
-
-| Size | Height | When to use |
-|---|---|---|
-| `small` | 40px | Navbar search |
-| `medium` | 48px | Page-level search |
-| `large` | 56px | Hero search |
-
----
-
-## Raw CSS Variable Usage
-
-Use `var(--token-name)` in plain CSS files or inline `style` attributes when Tailwind classes aren't available.
-
-```css
-.custom-element {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-card);
-  box-shadow: var(--shadow-card);
-  font-family: var(--font-sans);
-}
-```
-
-All variable names follow the pattern:
-- Colors → `--color-{name}`
-- Radius → `--radius-{name}`
-- Shadows → `--shadow-{name}`
-- Spacing → `--spacing-{name}`
-- Widths → `--width-{name}`
-- Typography → `--font-{name}`, `--tracking-{name}`
 
 ---
 
@@ -416,7 +322,7 @@ All variable names follow the pattern:
 --color-accent: #6366f1; /* indigo-500 — accent highlights */
 ```
 
-2. Mirror it in `tokens.js` under the matching export:
+2. Mirror it in `tokens.js`:
 
 ```js
 export const colors = {
@@ -425,51 +331,16 @@ export const colors = {
 };
 ```
 
-3. Use it immediately as `bg-accent` / `text-accent` anywhere — no restart needed in dev.
+3. Use it immediately anywhere as `bg-accent` / `text-accent` — no restart needed.
 
-If it's a pattern that repeats across components, also add a class string export to `tokens.js`:
+If it's a pattern that repeats across components, also add a class string to `tokens.js`:
 
 ```js
-export const accentBadge = "rounded-badge bg-accent text-inverted px-2 py-0.5 text-xs font-medium";
+export const accentTag = "rounded-badge bg-accent/10 text-accent px-2 py-0.5 text-xs font-medium";
 ```
 
----
+Then import and use it like any other class string:
 
-## Where Each Token is Used
-
-| Token / Class string | Used in |
-|---|---|
-| `bg-brand`, `text-inverted` | `ButtonVariants.js` (primary), `avatarVariants.js` |
-| `bg-brand-muted` | `ButtonVariants.js` (secondary, light, ghost hover), `navIconBtn`, dropdown items |
-| `bg-surface`, `border-border` | `searchBarVariants.js`, `DropdownMenu.jsx`, `card`, `cardLg` |
-| `bg-surface-dark` | `Footer.jsx` |
-| `text-body` | `inputBase`, `displayHeading`, `ButtonVariants.js` (outline, secondary) |
-| `text-secondary` | `fieldLabel`, `Navbar.jsx` (nav links, username) |
-| `text-muted` | `capsHeading`, `pillLabel`, dropdown icons, `Footer.jsx` links |
-| `text-subtle` | `inputBase` placeholder |
-| `text-on-dark` | `Footer.jsx` body text |
-| `text-danger`, `bg-danger` | `fieldError`, `inputBase` (aria-invalid), `ButtonVariants.js` (danger), `DropdownItem.jsx` |
-| `bg-success` | `ButtonVariants.js` (success) — Sell button in `Navbar.jsx` |
-| `bg-badge` | `notifBadge`, `notifBadgeSm` — `Navbar.jsx` |
-| `rounded-card` | `card`, `cardLg` — `HomePage.jsx` |
-| `rounded-panel` | `DropdownMenu.jsx` |
-| `rounded-input` | `inputBase` — `LoginForm.jsx`, `RegisterForm.jsx` |
-| `rounded-pill` | `searchBarBase`, `avatarBase`, `navIconBtn`, `notifBadge`, `pillLabel`, `Navbar.jsx` profile trigger |
-| `shadow-card` | `card`, `searchBarBase` |
-| `shadow-card-lg` | `cardLg` — `HomePage.jsx` hero panel |
-| `shadow-navbar` | `Navbar.jsx` header |
-| `max-w-page` | `pageContainer` — `Navbar.jsx`, `Footer.jsx`, `HomePage.jsx` |
-| `py-section` | `sectionPadding` — `Footer.jsx` |
-| `tracking-caps` | `capsHeading` — `HomePage.jsx`, `Footer.jsx` |
-| `tracking-display` | `displayHeading` — `HomePage.jsx` hero h1 |
-| `inputBase` | `LoginForm.jsx`, `RegisterForm.jsx` |
-| `fieldLabel` | `LoginForm.jsx`, `RegisterForm.jsx` |
-| `fieldError` | `LoginForm.jsx`, `RegisterForm.jsx` |
-| `pageContainer` | `Navbar.jsx`, `Footer.jsx`, `HomePage.jsx` |
-| `navIconBtn` | `Navbar.jsx` (messages, notifications — desktop + mobile) |
-| `notifBadge` | `Navbar.jsx` (desktop) |
-| `notifBadgeSm` | `Navbar.jsx` (mobile) |
-| `cardLg` | `HomePage.jsx` (architecture panel) |
-| `pillLabel` | `HomePage.jsx` (hero eyebrow) |
-| `capsHeading` | `HomePage.jsx`, `Footer.jsx` |
-| `displayHeading` | `HomePage.jsx` (hero h1) |
+```js
+import { accentTag } from "../styles";
+```
